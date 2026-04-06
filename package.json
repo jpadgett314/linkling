@@ -1,5 +1,5 @@
 {
-  "name": "mock-linkwarden-server",
+  "name": "lingling-server",
   "version": "1.0.0",
   "private": true,
   "description": "Express mock of Linkwarden API routes used by the browser extension",
