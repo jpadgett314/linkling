@@ -1,15 +1,23 @@
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'node:fs/promises';
+import { CollectionDirectory } from './CollectionDirectory.js';
 
 const PORT = Number(process.env.PORT) || 3000;
 const app = express();
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-/** @type {{ id: number, body: object }[]} */
-const links = [];
-let nextId = 1;
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const configPath = path.join(projectRoot, 'config.json');
+const rawConfig = await fs.readFile(configPath, 'utf8');
+const parsedConfig = JSON.parse(rawConfig);
+const collectionsDir = path.resolve(projectRoot, parsedConfig.collectionDirectory ?? './collections');
+const collections = new CollectionDirectory(collectionsDir);
+await collections.initialize();
 
 function logSection(title) {
   console.log(`\n--- ${title} ---`);
@@ -77,22 +85,21 @@ app.get('/api/v1/collections', (req, res) => {
   logSection('GET /api/v1/collections');
   logAuth(req);
   const now = new Date().toISOString();
+  const metadata = collections.getAllMetadata();
   res.json({
-    response: [
-      {
-        id: 1,
-        name: 'Unorganized',
-        color: '#6366f1',
-        createdAt: now,
-        description: '',
-        isPublic: false,
-        members: [],
-        ownerId: 1,
-        parent: null,
-        parentId: null,
-        updatedAt: now,
-      },
-    ],
+    response: metadata.map((m) => ({
+      id: m.id,
+      name: m.name,
+      color: '#6366f1',
+      createdAt: now,
+      description: '',
+      isPublic: false,
+      members: [],
+      ownerId: 1,
+      parent: null,
+      parentId: null,
+      updatedAt: now,
+    })),
   });
 });
 
@@ -100,42 +107,60 @@ app.get('/api/v1/tags', (req, res) => {
   logSection('GET /api/v1/tags');
   logAuth(req);
   const now = new Date().toISOString();
+  const tags = collections.getAllTags();
   res.json({
-    response: [
-      {
-        id: 1,
-        name: 'sample-tag',
-        ownerId: 1,
-        createdAt: now,
-        updatedAt: now,
-        _count: { links: 0 },
-      },
-    ],
+    response: tags.map((name, idx) => ({
+      id: idx + 1,
+      name,
+      ownerId: 1,
+      createdAt: now,
+      updatedAt: now,
+      _count: { links: 0 },
+    })),
   });
 });
 
 // --- Links CRUD + search (extension core) ---
 
-app.post('/api/v1/links', (req, res) => {
+app.post('/api/v1/links', async (req, res) => {
   logSection('POST /api/v1/links (save bookmark)');
   logAuth(req);
   console.log('Bookmark payload:', JSON.stringify(req.body, null, 2));
+  try {
+    const collectionId = Number(req.body?.collection?.id ?? 1);
+    const rawTags = Array.isArray(req.body.tags) ? req.body.tags : [];
+    const tags = rawTags
+      .map((t) => (typeof t === 'string' ? t : t?.name))
+      .filter((t) => typeof t === 'string' && t.trim().length > 0);
 
-  const id = nextId++;
-  const collectionId = 1;
-  const stored = {
-    id,
-    collectionId,
-    url: req.body.url,
-    name: req.body.name,
-    description: req.body.description,
-    collection: req.body.collection ?? { name: 'Unorganized' },
-    tags: req.body.tags ?? [],
-    image: req.body.image,
-  };
-  links.push({ id, body: req.body });
+    await collections.saveBookmark({
+      collectionId,
+      name: req.body.name,
+      url: req.body.url,
+      description: req.body.description ?? '',
+      tags,
+    });
 
-  res.status(201).json({ response: stored });
+    const stored = {
+      id: Date.now(),
+      collectionId,
+      url: req.body.url,
+      name: req.body.name,
+      description: req.body.description ?? '',
+      collection: req.body.collection ?? { id: collectionId },
+      tags: rawTags,
+      image: req.body.image,
+    };
+
+    res.status(201).json({ response: stored });
+  } catch (err) {
+    console.error('Error saving bookmark:', err);
+    if (err instanceof Error && err.message.startsWith('Unknown collection id')) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: 'Failed to save bookmark' });
+    }
+  }
 });
 
 app.put('/api/v1/links/:id', (req, res) => {
@@ -168,16 +193,14 @@ app.get('/api/v1/search', (req, res) => {
   const urlMatch = /^url:(.+)$/.exec(String(q));
   const targetUrl = urlMatch ? decodeURIComponent(urlMatch[1].trim()) : '';
 
-  const matching = targetUrl
-    ? links.filter((l) => l.body.url === targetUrl)
-    : [];
+  const results = targetUrl ? collections.searchByUrl(targetUrl) : [];
 
   res.json({
     data: {
-      links: matching.map((l) => ({
-        id: l.id,
-        url: l.body.url,
-        name: l.body.name,
+      links: results.map((r, idx) => ({
+        id: idx + 1,
+        url: r.url,
+        name: r.name,
       })),
     },
   });
