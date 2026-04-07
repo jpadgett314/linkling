@@ -1,5 +1,6 @@
 import { Collection } from "./Collection.js";
 /** @typedef {import('./types.js').GlobalBookmark} GlobalBookmark */
+/** @typedef {import('./types.js').CollectionMetadata} CollectionMetadata */
 
 class Library {
   /** @param {Collection[]} collections */
@@ -25,8 +26,14 @@ class Library {
     return [...this._tagIndex].sort((a, b) => a.localeCompare(b));
   }
 
+  /** @returns {CollectionMetadata[]} */
   getAllMetadata() {
-    return [...this._collections.values()].map(({ id, name, description }) => ({ id, name, description }));
+    return [...this._collections.values()].map(({ id, name, description, color }) => ({
+      id,
+      name,
+      description,
+      color,
+    }));
   }
 
   /** 

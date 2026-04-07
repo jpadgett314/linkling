@@ -1,12 +1,14 @@
+/** @typedef {import('../types.js').CollectionMetadata} CollectionMetadata */
+
 /**
- * @param {{ id: number, name: string, description: string }} metadata
+ * @param {CollectionMetadata} metadata
  * @param {string} now
  */
 function mapCollection(metadata, now) {
   return {
     id: metadata.id,
     name: metadata.name,
-    color: '#6366f1',
+    color: metadata.color,
     createdAt: now,
     description: metadata.description ?? '',
     isPublic: false,

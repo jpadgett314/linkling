@@ -23,6 +23,14 @@
  */
 
 /**
+ * @typedef {object} CollectionMetadata
+ * @property {number} id
+ * @property {string} name
+ * @property {string} description
+ * @property {string} color
+ */
+
+/**
  * @typedef {object} CollectionDoc
  * @property {number} id
  * @property {string} name
