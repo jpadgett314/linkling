@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import { createAuthRoutes } from './routes/authRoutes.js';
-import { createLibraryRoutes } from './routes/libraryRoutes.js';
+import { createAuthRoutes } from './routes/auth.js';
+import { createBookmarkRoutes } from './routes/bookmarks.js';
 
 function createServer(library) {
   const app = express();
@@ -11,7 +11,7 @@ function createServer(library) {
   app.use(express.urlencoded({ extended: true }));
 
   app.use('/api/v1', createAuthRoutes());
-  app.use('/api/v1', createLibraryRoutes(library));
+  app.use('/api/v1', createBookmarkRoutes(library));
 
   app.use((req, res) => {
     res.status(404).json({ error: 'Not found', path: req.originalUrl });

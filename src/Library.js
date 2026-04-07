@@ -1,4 +1,5 @@
 import { Collection } from "./Collection.js";
+
 /** @typedef {import('./types.js').GlobalBookmark} GlobalBookmark */
 /** @typedef {import('./types.js').CollectionMetadata} CollectionMetadata */
 
@@ -6,12 +7,15 @@ class Library {
   /** @param {Collection[]} collections */
   constructor(collections) {
     /** @type {Map<number, Collection>} */
-    this._collections = new Map(collections.map(c => [c.id, c]));
+    this._collections = new Map(collections.map(c => [c.getMetadata().id, c]));
     /** @type {Set<string>} */
     this._tagIndex = new Set();
   }
 
-  init() {
+  /**
+   * Indices must be built before querying tags/bookmarks.
+   */
+  async buildIndex() {
     this._tagIndex.clear();
     for (const collection of this._collections.values()) {
       for (const bookmark of collection) {
@@ -22,48 +26,51 @@ class Library {
     }
   }
 
+  /** 
+   * @param {string} url 
+   * @returns {Promise<GlobalBookmark[]>} 
+   */
+  async findUrl(url) {
+    const matches = await Promise.all(
+      this._collections.entries().map(
+        ([id, collection]) => {
+          return collection.find(url).then(b => {
+            return b ? { url, collectionId: id, ...b } : null
+          })
+        }
+      )
+    )
+    return matches.filter(e => e != null);
+  }
+
+  /** 
+   * @param {GlobalBookmark} bookmark 
+   */
+  async saveBookmark(bookmark) {
+    const collectionId = bookmark.collectionId;
+    const collection = this._collections.get(collectionId);
+    if (collection) {
+      await collection.save(bookmark);
+      for (const tag of bookmark.tags ?? []) {
+        this._tagIndex.add(tag);
+      }
+    } else {
+      throw new Error(`Collection not found: ${collectionId}`);
+    }
+  }
+
+  /** 
+   * @returns {string[]} 
+   */
   getAllTags() {
     return [...this._tagIndex].sort((a, b) => a.localeCompare(b));
   }
 
-  /** @returns {CollectionMetadata[]} */
-  getAllMetadata() {
-    return [...this._collections.values()].map(({ id, name, description, color }) => ({
-      id,
-      name,
-      description,
-      color,
-    }));
-  }
-
   /** 
-   * @param {string} url 
-   * @returns {GlobalBookmark[]} 
+   * @returns {CollectionMetadata[]} 
    */
-  async findUrl(url) {
-    /** @type {GlobalBookmark[]} */
-    const matches = [];
-    for (const collection of this._collections.values()) {
-      const bookmark = await collection.find(url);
-      if (bookmark) {
-        matches.push({ collectionId: collection.id, url, ...bookmark });
-      }
-    }
-    return matches;
-  }
-
-  /** @param {GlobalBookmark} bookmark */
-  async saveBookmark(bookmark) {
-    const collection = this._collections.get(bookmark.collectionId);
-    if (!collection) {
-      throw new Error(`Collection not found: ${bookmark.collectionId}`);
-    }
-
-    await collection.save(bookmark);
-
-    for (const tag of bookmark.tags ?? []) {
-      this._tagIndex.add(tag);
-    }
+  getAllMetadata() {
+    return [...this._collections.values()].map(c => c.getMetadata());
   }
 }
 

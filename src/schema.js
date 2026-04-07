@@ -9,12 +9,10 @@ const BookmarkDataSchema = z.object({
 const CollectionDocSchema = z.object({
   id: z.number(),
   name: z.string(),
+  color: z.string(),
   version: z.number(),
   bookmarks: z.record(z.string(), BookmarkDataSchema),
 });
 
-const ConfigFileSchema = z.object({
-  collectionDirectory: z.string().optional(),
-});
 
-export { BookmarkDataSchema, CollectionDocSchema, ConfigFileSchema };
+export { BookmarkDataSchema, CollectionDocSchema };

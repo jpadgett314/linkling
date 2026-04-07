@@ -1,36 +1,51 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { BookmarkService } from '../services/bookmarkService.js';
-import { mapCollection, mapTag, mapStoredLink, mapSearchLink } from '../mappers/linkwardenMapper.js';
+import { mapCollection, mapTag, mapStoredLink, mapSearchLink } from '../linkwardenMapper.js';
 
-function logAuth(req) {
-  const auth = req.headers.authorization;
-  console.log('Authorization:', auth ?? '(none)');
-}
-
-function createLibraryRoutes(library) {
+function createBookmarkRoutes(library) {
   const router = Router();
   const upload = multer({ storage: multer.memoryStorage() });
   const bookmarkService = new BookmarkService(library);
 
   router.get('/collections', (req, res) => {
-    logAuth(req);
     const now = new Date().toISOString();
     const metadata = library.getAllMetadata();
     res.json({ response: metadata.map((m) => mapCollection(m, now)) });
   });
 
   router.get('/tags', (req, res) => {
-    logAuth(req);
     const now = new Date().toISOString();
     const tags = library.getAllTags();
     res.json({ response: tags.map((name, idx) => mapTag(name, idx, now)) });
   });
 
-  router.post('/links', async (req, res) => {
-    logAuth(req);
-    console.log('Bookmark payload:', JSON.stringify(req.body, null, 2));
+  router.get('/search', async (req, res) => {
+    const results = await bookmarkService.searchLinks(req.query.searchQueryString);
+    res.json({
+      data: {
+        links: results.map((r, idx) => mapSearchLink(r, idx)),
+      },
+    });
+  });
 
+  router.put('/links/:id', (req, res) => {
+    console.log('Bookmark payload:', JSON.stringify(req.body, null, 2));
+    res.json({
+      response: {
+        id: Number(req.params.id),
+        collectionId: 1,
+        ...req.body,
+      },
+    });
+  });
+
+  router.delete('/links/:id', (req, res) => {
+    res.json({ response: { ok: true } });
+  });
+
+  router.post('/links', async (req, res) => {
+    console.log('Bookmark payload:', JSON.stringify(req.body, null, 2));
     try {
       const saved = await bookmarkService.createFromBody(req.body);
       res.status(201).json({ response: mapStoredLink(saved) });
@@ -45,35 +60,7 @@ function createLibraryRoutes(library) {
     }
   });
 
-  router.put('/links/:id', (req, res) => {
-    logAuth(req);
-    console.log('Bookmark payload:', JSON.stringify(req.body, null, 2));
-    res.json({
-      response: {
-        id: Number(req.params.id),
-        collectionId: 1,
-        ...req.body,
-      },
-    });
-  });
-
-  router.delete('/links/:id', (req, res) => {
-    logAuth(req);
-    res.json({ response: { ok: true } });
-  });
-
-  router.get('/search', async (req, res) => {
-    logAuth(req);
-    const results = await bookmarkService.searchLinks(req.query.searchQueryString);
-    res.json({
-      data: {
-        links: results.map((r, idx) => mapSearchLink(r, idx)),
-      },
-    });
-  });
-
   router.post('/archives/:id', upload.single('file'), (req, res) => {
-    logAuth(req);
     const file = req.file;
     console.log('Archive upload:', {
       linkId: req.params.id,
@@ -88,4 +75,4 @@ function createLibraryRoutes(library) {
   return router;
 }
 
-export { createLibraryRoutes };
+export { createBookmarkRoutes };

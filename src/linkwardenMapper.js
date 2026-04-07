@@ -1,4 +1,4 @@
-/** @typedef {import('../types.js').CollectionMetadata} CollectionMetadata */
+/** @typedef {import('./types.js').CollectionMetadata} CollectionMetadata */
 
 /**
  * @param {CollectionMetadata} metadata

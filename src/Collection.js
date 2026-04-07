@@ -1,19 +1,9 @@
 /** @interface */
 class Collection {
   /**
-   * @returns {number} 
+   * @return {CollectionMetadata}
    */
-  get id() {}
-
-  /** 
-   * @returns {string} 
-   */
-  get name() {}
-  
-  /** 
-   * @returns {string}
-   */
-  get description() {}
+  getMetadata() {}
 
   /** 
    * @param {string} url 
