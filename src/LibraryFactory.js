@@ -50,6 +50,7 @@ class LibraryFactory {
    * @returns {Promise<Library>} Queryable Library
    */
   async makeLibrary() {
+    await fs.mkdir(this._dir, { recursive: true });
     const collections = await loadJsonDir(this._dir);
     ensureUnique(collections);
     const library = new Library(collections);

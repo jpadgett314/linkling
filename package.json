@@ -1,12 +1,19 @@
 {
-  "name": "lingling-server",
-  "version": "1.0.0",
+  "name": "linkling-server",
+  "version": "0.1.0",
   "private": true,
   "description": "Express mock of Linkwarden API routes used by the browser extension",
+  "author": {
+    "name": "Jacob Padgett",
+    "email": "jacobapadgett@gmail.com",
+    "url": "https://github.com/jpadgett314/"
+  },
   "type": "module",
-  "main": "src/index.js",
+  "main": "electron-main.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "electron:dev": "electron .",
+    "dist:win": "electron-builder --win nsis"
   },
   "engines": {
     "node": ">=18"
@@ -17,5 +24,31 @@
     "multer": "^1.4.5-lts.2",
     "write-file-atomic": "^7.0.1",
     "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "electron": "^41.1.1",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "com.linkling.server",
+    "productName": "Linkling",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist/**",
+      "!.git/**"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/icon-256.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { BookmarkService } from '../services/bookmarkService.js';
+import { BookmarkService } from '../services/BookmarkService.js';
 import { mapCollection, mapTag, mapStoredLink, mapSearchLink } from '../linkwardenMapper.js';
 
 function createBookmarkRoutes(library) {
