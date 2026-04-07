@@ -13,4 +13,8 @@ const CollectionDocSchema = z.object({
   bookmarks: z.record(z.string(), BookmarkDataSchema),
 });
 
-export { BookmarkDataSchema, CollectionDocSchema }; 
+const ConfigFileSchema = z.object({
+  collectionDirectory: z.string().optional(),
+});
+
+export { BookmarkDataSchema, CollectionDocSchema, ConfigFileSchema };
