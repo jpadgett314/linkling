@@ -3,6 +3,9 @@ import path from 'node:path';
 import writeFileAtomic from 'write-file-atomic';
 import { Collection } from './Collection.js';
 import { CollectionDocSchema } from './schema.js';
+/** @typedef {import('./types.js').Bookmark} Bookmark */
+/** @typedef {import('./types.js').BookmarkData} BookmarkData */
+/** @typedef {import('./types.js').CollectionDoc} CollectionDoc */
 
 /** @implements {Collection} */
 class CollectionFile {

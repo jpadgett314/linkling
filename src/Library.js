@@ -1,4 +1,5 @@
 import { Collection } from "./Collection.js";
+/** @typedef {import('./types.js').GlobalBookmark} GlobalBookmark */
 
 class Library {
   /** @param {Collection[]} collections */
