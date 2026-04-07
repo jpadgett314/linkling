@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs/promises';
 import { CollectionDirectory } from './CollectionDirectory.js';
+import { Library } from './Library.js';
 
 const PORT = Number(process.env.PORT) || 3000;
 const app = express();
@@ -16,8 +17,10 @@ const configPath = path.join(projectRoot, 'config.json');
 const rawConfig = await fs.readFile(configPath, 'utf8');
 const parsedConfig = JSON.parse(rawConfig);
 const collectionsDir = path.resolve(projectRoot, parsedConfig.collectionDirectory ?? './collections');
-const collections = new CollectionDirectory(collectionsDir);
-await collections.initialize();
+const collectionDirectory = new CollectionDirectory(collectionsDir);
+await collectionDirectory.initialize();
+const library = new Library(collectionDirectory.collections);
+library.init();
 
 function logSection(title) {
   console.log(`\n--- ${title} ---`);
@@ -85,7 +88,7 @@ app.get('/api/v1/collections', (req, res) => {
   logSection('GET /api/v1/collections');
   logAuth(req);
   const now = new Date().toISOString();
-  const metadata = collections.getAllMetadata();
+  const metadata = library.getAllMetadata();
   res.json({
     response: metadata.map((m) => ({
       id: m.id,
@@ -107,7 +110,7 @@ app.get('/api/v1/tags', (req, res) => {
   logSection('GET /api/v1/tags');
   logAuth(req);
   const now = new Date().toISOString();
-  const tags = collections.getAllTags();
+  const tags = library.getAllTags();
   res.json({
     response: tags.map((name, idx) => ({
       id: idx + 1,
@@ -133,7 +136,7 @@ app.post('/api/v1/links', async (req, res) => {
       .map((t) => (typeof t === 'string' ? t : t?.name))
       .filter((t) => typeof t === 'string' && t.trim().length > 0);
 
-    await collections.saveBookmark({
+    await library.saveBookmark({
       collectionId,
       name: req.body.name,
       url: req.body.url,
@@ -184,7 +187,7 @@ app.delete('/api/v1/links/:id', (req, res) => {
   res.json({ response: { ok: true } });
 });
 
-app.get('/api/v1/search', (req, res) => {
+app.get('/api/v1/search', async (req, res) => {
   logSection('GET /api/v1/search');
   logAuth(req);
   const q = req.query.searchQueryString ?? '';
@@ -193,7 +196,7 @@ app.get('/api/v1/search', (req, res) => {
   const urlMatch = /^url:(.+)$/.exec(String(q));
   const targetUrl = urlMatch ? decodeURIComponent(urlMatch[1].trim()) : '';
 
-  const results = targetUrl ? collections.searchByUrl(targetUrl) : [];
+  const results = targetUrl ? await library.findUrl(targetUrl) : [];
 
   res.json({
     data: {
