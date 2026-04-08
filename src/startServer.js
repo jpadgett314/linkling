@@ -1,5 +1,5 @@
-import { ConfigurationRegistry } from './configuration/ConfigurationRegistry.js';
-import { LibraryFactory } from './LibraryFactory.js';
+import { ConfigurationRegistry } from './features/configuration/ConfigurationRegistry.js';
+import { LibraryFactory } from './features/library/LibraryFactory.js';
 import { createServer } from './server.js';
 
 async function startServer(port = Number(process.env.PORT) || 3000) {

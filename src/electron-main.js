@@ -1,8 +1,5 @@
 import { app, Tray, Menu, nativeImage, dialog } from 'electron';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -17,23 +14,19 @@ let httpPort = null;
 let tray = null;
 
 async function startServerWrapper() {
-  const { startServer } = await import('./src/startServer.js');
+  const { startServer } = await import('./startServer.js');
   const requestedPort = Number(process.env.PORT) || 3000;
   const { server, port } = await startServer(requestedPort);
   httpServer = server;
   httpPort = port;
 }
 
-async function closeServer() {
-
-}
-
 function trayIcon() {
-  const iconPath = path.join(__dirname, 'assets', 'icon-256.ico');
+  const iconPath = path.join(app.getAppPath(), 'assets', 'icon-256.ico');
   return nativeImage.createFromPath(iconPath);
 }
 
-function buildMenu(port) {
+function buildMenu() {
   return Menu.buildFromTemplate([
     {
       label: 'Select Library Folder',

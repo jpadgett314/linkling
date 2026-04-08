@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-import { createAuthRoutes } from './routes/auth.js';
-import { createBookmarkRoutes } from './routes/bookmarks.js';
-import { createConfigurationRoutes } from './routes/configuration.js';
+import { createAuthRoutes } from './features/auth/routes.js';
+import { createBookmarkRoutes } from './features/library/routes.js';
+import { createConfigurationRoutes } from './features/configuration/routes.js';
 
 function createServer(registry, library) {
   const app = express();
