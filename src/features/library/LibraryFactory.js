@@ -2,57 +2,72 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { CollectionFile } from './CollectionFile.js';
 import { Library } from './Library.js';
+import { ZodError } from 'zod';
+
+
 
 /**
- * @param {string} dir Directory containing JSON collection files
+ * Initialize Bookmark Library directory and load JSON collections.
+ * @param {string} dir Path to Bookmark Library
  * @returns {Promise<CollectionFile[]>}
  */
-async function loadJsonDir(dir) {
-  return Promise.all(
-    (await fs.readdir(dir))
-      .filter(f => f.endsWith(".json"))
-      .map(f => path.resolve(dir, f))
-      .map(path => new CollectionFile(path))
-      .map(async file => { await file.load(); return file })
-  );
-}
+async function loadLibrary(dir) {
+  await fs.mkdir(dir, { recursive: true });
 
-/**
- * Throws if multiple collections are using the same ID.
- * @param {Collection[]} collections 
- */
-function ensureUnique(collections) {
-  /** @type {Map<number, string>} collectionId -> name */
-  const seen = new Map();
-  for (const collection of collections) {
-    const { id, name } = collection.getMetadata();
-    if (seen.has(id)) {
-      throw new Error(
-        `Duplicate collection id detected: ${id} between` + 
-        `collection "${name}" and ` + 
-        `collection "${seen.get(id)}."`
-      );
+  /** @type {Set<number, CollectionFile>} collectionId -> obj */
+  const matches = new Map();
+  /** @type {string[]} */
+  const entries = await fs.readdir(dir);
+
+  const loadCollection = async (name) => {
+    if (!(name.endsWith('.json'))) {
+      console.log(`Skipping non-JSON file: ${name}`);
+      return;
     }
-    seen.set(id, name);
+    try {
+      const collection = await CollectionFile.fromPath(path.join(dir, name));
+      const { id, version } = collection.getMetadata();
+      if (matches.has(id)) {
+        console.log(`Skipping ${name} (repeated ID)`);
+      } else if (version != 1 ) {
+        console.log(`Skipping ${name} (unsupported version)`);
+      } else {
+        matches.set(id, collection);
+      }
+    } catch(error) {
+      if (error instanceof SyntaxError) {
+        console.log(`Skipping ${name} (invalid JSON)`);
+      } else if (error instanceof ZodError) {
+        console.log(`Skipping ${name} (invalid collection)`);
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  await Promise.all(entries.map(loadCollection));
+
+  if (matches.size === 0) {
+    return [await CollectionFile.fromDefaults(dir)];
+  } else {
+    return [...matches.values()];
   }
 }
 
 class LibraryFactory {
-  /** 
-   * @param {string} collectionsDir Path to directory containing collection JSON files 
+  /**
+   * @param {string} libraryDirectory Path to Bookmark Library directory
    */
-  constructor(collectionsDir) {
+  constructor(libraryDirectory) {
     /** @type {string} */
-    this._dir = path.resolve(collectionsDir);
+    this._dir = path.resolve(libraryDirectory);
   }
 
   /**
    * @returns {Promise<Library>} Queryable Library
    */
   async makeLibrary() {
-    await fs.mkdir(this._dir, { recursive: true });
-    const collections = await loadJsonDir(this._dir);
-    ensureUnique(collections);
+    const collections = await loadLibrary(this._dir);
     const library = new Library(collections);
     await library.buildIndex();
     return library;

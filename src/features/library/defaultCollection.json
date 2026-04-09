@@ -1,0 +1,13 @@
+{
+  "id": 1,
+  "name": "Default Collection",
+  "color": "#ff0000",
+  "version": 1,
+  "bookmarks": {
+    "https://github.com/jpadgett314/linkling": {
+      "name": "jpadgett314/linkling: JSON-based bookmark server. Linkwarden compatible.",
+      "description": "",
+      "tags": []
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import writeFileAtomic from 'write-file-atomic';
+import DEFAULT_COLLECTION from './defaultCollection.json' with { type: 'json' };
 import { Collection } from './Collection.js';
 import { CollectionDocSchema } from './schema.js';
 
@@ -11,50 +12,47 @@ import { CollectionDocSchema } from './schema.js';
 
 /** @implements {Collection} */
 class CollectionFile {
-  /** 
-   * @param {string} filePath Absolute or relative path to the collection JSON file 
+  /**
+   * @param {string} filePath Absolute or relative path to JSON collection file
    */
-  constructor(filePath) {
+  static async fromPath(filePath) {
+    const obj = new CollectionFile();
     /** @type {string} */
-    this._filePath = path.resolve(filePath);
-    /** @type {CollectionDoc | null} */
-    this._doc = null;
+    obj._filePath = path.resolve(filePath);
+    /** @type {CollectionDoc} */
+    obj._doc = CollectionDocSchema.parse(
+      JSON.parse(await fs.readFile(filePath, 'utf8'))
+    );
+    obj.sync();
+    return obj;
   }
 
-  /** 
-   * @returns {CollectionMetadata} 
+  /**
+   * @param {string} folderPath Absolute or relative path to destination folder
+   */
+  static async fromDefaults(folderPath){
+    const obj = new CollectionFile();
+    /** @type {string} */
+    obj._filePath = path.resolve(folderPath, `links-${Date.now()}.json`);
+    /** @type {CollectionDoc} */
+    obj._doc = CollectionDocSchema.parse(DEFAULT_COLLECTION);
+    obj.sync();
+    return obj;
+  }
+
+  /**
+   * @returns {CollectionMetadata}
    */
   getMetadata() {
-    this._requireLoaded();
     /** @type {CollectionDoc} */
     const { bookmarks, ...metadata } = this._doc;
     return metadata;
   }
 
-  /** 
-   * @param {string} url 
-   */
-  async find(url) {
-    this._requireLoaded();
-    return this._doc.bookmarks[String(url).trim()];
-  }
-
-  /** 
-   * @param {Bookmark} bookmark 
-   */
-  async save(bookmark) {
-    this._requireLoaded();
-    /** @type {BookmarkData} */
-    const { url, name, description, tags } = bookmark;
-    this._doc.bookmarks[String(url).trim()] = { name, description, tags };
-    this._saveFile();
-  }
-
-  /** 
-   * @returns {IterableIterator<Bookmark>} 
+  /**
+   * @returns {IterableIterator<Bookmark>}
    */
   *[Symbol.iterator]() {
-    this._requireLoaded();
     for (const url in this._doc.bookmarks) {
       /** @type {Bookmark} */
       const bookmark = { url, ...this._doc.bookmarks[url] };
@@ -63,32 +61,28 @@ class CollectionFile {
   }
 
   /**
-   * Must load JSON before querying collection
+   * @param {string} url
    */
-  async load() {
-    this._doc = CollectionDocSchema.parse(
-      JSON.parse(
-        await fs.readFile(this._filePath, 'utf8')
-      )
-    );
+  async find(url) {
+    return this._doc.bookmarks[String(url).trim()];
   }
 
   /**
-   * Sync collection and JSON file
+   * @param {Bookmark} bookmark
    */
-  async _saveFile() {
-    this._requireLoaded();
-    const payload = JSON.stringify(this._doc);
+  async save(bookmark) {
+    /** @type {BookmarkData} */
+    const { url, name, description, tags } = bookmark;
+    this._doc.bookmarks[String(url).trim()] = { name, description, tags };
+    this.sync();
+  }
+
+  /**
+   * Sync collection changes to JSON file (one way)
+   */
+  async sync() {
+    const payload = JSON.stringify(this._doc, null, 2);
     await writeFileAtomic(this._filePath, payload, 'utf8');
-  }
-
-  /**
-   * Ensures that this.load() has been called before query
-   */
-  _requireLoaded() {
-    if (!this._doc) {
-      throw new Error('Collection not loaded; call load() first.');
-    }
   }
 }
 
