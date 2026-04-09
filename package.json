@@ -13,7 +13,8 @@
   "scripts": {
     "start": "node src/index.js",
     "electron:dev": "electron .",
-    "dist:win": "electron-builder --win nsis"
+    "dist:nsis": "electron-builder --win nsis",
+    "dist:flatpak": "electron-builder --linux flatpak"
   },
   "engines": {
     "node": ">=18"
@@ -49,6 +50,27 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "target": [
+        "flatpak"
+      ],
+      "icon": "assets/icon-512.png",
+      "category": "Utility",
+      "maintainer": "Jacob Padgett <jacobapadgett@gmail.com>"
+    },
+    "flatpak": {
+      "runtime": "org.freedesktop.Platform",
+      "runtimeVersion": "25.08",
+      "sdk": "org.freedesktop.Sdk",
+      "finishArgs": [
+        "--share=ipc",
+        "--share=network",
+        "--socket=x11",
+        "--socket=wayland",
+        "--device=dri",
+        "--filesystem=home"
+      ]
     }
   }
 }

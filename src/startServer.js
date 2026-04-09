@@ -2,7 +2,7 @@ import { ConfigurationRegistry } from './features/configuration/ConfigurationReg
 import { LibraryFactory } from './features/library/LibraryFactory.js';
 import { createServer } from './server.js';
 
-async function startServer(port = Number(process.env.PORT) || 3000) {
+async function startServer(port, host) {
   const registry = new ConfigurationRegistry()
   await registry.init();
   const libraryFactory = new LibraryFactory(registry.get('libraryDirectory'));
@@ -10,7 +10,7 @@ async function startServer(port = Number(process.env.PORT) || 3000) {
   const expressApp = createServer(registry, library);
 
   return new Promise((resolve, reject) => {
-    const server = expressApp.listen(port, () => {
+    const server = expressApp.listen(port, host, () => {
       const addr = server.address();
       const boundPort =
         typeof addr === 'object' && addr !== null ? addr.port : port;
