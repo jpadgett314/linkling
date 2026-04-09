@@ -2,36 +2,34 @@
 
 /**
  * @param {CollectionMetadata} metadata
- * @param {string} now
  */
-function mapCollection(metadata, now) {
+function mapCollection(metadata) {
   return {
     id: metadata.id,
     name: metadata.name,
     color: metadata.color,
-    createdAt: now,
+    createdAt: (new Date()).toISOString(),
     description: metadata.description ?? '',
     isPublic: false,
     members: [],
     ownerId: 1,
     parent: null,
     parentId: null,
-    updatedAt: now,
+    updatedAt: (new Date()).toISOString(),
   };
 }
 
 /**
  * @param {string} name
  * @param {number} idx
- * @param {string} now
  */
-function mapTag(name, idx, now) {
+function mapTag(name, idx) {
   return {
     id: idx + 1,
     name,
     ownerId: 1,
-    createdAt: now,
-    updatedAt: now,
+    createdAt: (new Date()).toISOString(),
+    updatedAt: (new Date()).toISOString(),
     _count: { links: 0 },
   };
 }

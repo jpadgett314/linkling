@@ -5,7 +5,7 @@ class BookmarkService {
 
   /** @param {any} body */
   async createFromBody(body) {
-    const collectionId = Number(body?.collection?.id ?? 1);
+    const collectionId = Number(body?.collection?.id ?? 0);
     const rawTags = Array.isArray(body?.tags) ? body.tags : [];
     const tags = rawTags
       .map((t) => (typeof t === 'string' ? t : t?.name))

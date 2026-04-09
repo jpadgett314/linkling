@@ -9,15 +9,13 @@ function createBookmarkRoutes(library) {
   const bookmarkService = new BookmarkService(library);
 
   router.get('/collections', (req, res) => {
-    const now = new Date().toISOString();
     const metadata = library.getAllMetadata();
-    res.json({ response: metadata.map((m) => mapCollection(m, now)) });
+    res.json({ response: metadata.map((m) => mapCollection(m)) });
   });
 
   router.get('/tags', (req, res) => {
-    const now = new Date().toISOString();
     const tags = library.getAllTags();
-    res.json({ response: tags.map((name, idx) => mapTag(name, idx, now)) });
+    res.json({ response: tags.map((name, idx) => mapTag(name, idx)) });
   });
 
   router.get('/search', async (req, res) => {

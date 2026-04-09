@@ -4,8 +4,6 @@ import { CollectionFile } from './CollectionFile.js';
 import { Library } from './Library.js';
 import { ZodError } from 'zod';
 
-
-
 /**
  * Initialize Bookmark Library directory and load JSON collections.
  * @param {string} dir Path to Bookmark Library
@@ -47,11 +45,11 @@ async function loadLibrary(dir) {
 
   await Promise.all(entries.map(loadCollection));
 
-  if (matches.size === 0) {
-    return [await CollectionFile.fromDefaults(dir)];
-  } else {
-    return [...matches.values()];
+  if (!matches.has(0)) {
+    matches.set(0, await CollectionFile.fromDefaults(dir));
   }
+
+  return [...matches.values()];
 }
 
 class LibraryFactory {
