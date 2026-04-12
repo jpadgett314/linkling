@@ -23,7 +23,7 @@ async function loadLibrary(dir) {
       return;
     }
     try {
-      const collection = await CollectionFile.fromPath(path.join(dir, name));
+      const collection = await CollectionFile.fromExisting(path.join(dir, name));
       const { id, version } = collection.getMetadata();
       if (matches.has(id)) {
         console.log(`Skipping ${name} (repeated ID)`);

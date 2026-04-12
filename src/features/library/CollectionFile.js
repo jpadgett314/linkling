@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import writeFileAtomic from 'write-file-atomic';
 import DEFAULT_COLLECTION from './defaultCollection.json' with { type: 'json' };
+import { Mutex } from 'async-mutex';
 import { Collection } from './Collection.js';
 import { CollectionDocSchema } from './schema.js';
 
@@ -12,31 +13,35 @@ import { CollectionDocSchema } from './schema.js';
 
 /** @implements {Collection} */
 class CollectionFile {
+  constructor() {
+    /** @type {Mutex} */
+    this._mutex = new Mutex();
+  }
+
   /**
    * @param {string} filePath Absolute or relative path to JSON collection file
    */
-  static async fromPath(filePath) {
+  static async fromExisting(filePath) {
     const obj = new CollectionFile();
     /** @type {string} */
-    obj._filePath = path.resolve(filePath);
+    obj._path = path.resolve(filePath);
     /** @type {CollectionDoc} */
     obj._doc = CollectionDocSchema.parse(
-      JSON.parse(await fs.readFile(filePath, 'utf8'))
+      JSON.parse(await fs.readFile(obj._path, 'utf8'))
     );
-    obj.sync();
     return obj;
   }
 
   /**
-   * @param {string} folderPath Absolute or relative path to destination folder
+   * @param {string} folderPath Location to create new collection file
    */
-  static async fromDefaults(folderPath){
+  static async fromDefaults(folderPath) {
     const obj = new CollectionFile();
     /** @type {string} */
-    obj._filePath = path.resolve(folderPath, `links-${Date.now()}.json`);
+    obj._path = path.resolve(folderPath, `links-${Date.now()}.json`);
     /** @type {CollectionDoc} */
     obj._doc = CollectionDocSchema.parse(DEFAULT_COLLECTION);
-    obj.sync();
+    await obj.sync();
     return obj;
   }
 
@@ -44,7 +49,6 @@ class CollectionFile {
    * @returns {CollectionMetadata}
    */
   getMetadata() {
-    /** @type {CollectionDoc} */
     const { bookmarks, ...metadata } = this._doc;
     return metadata;
   }
@@ -54,7 +58,6 @@ class CollectionFile {
    */
   *[Symbol.iterator]() {
     for (const url in this._doc.bookmarks) {
-      /** @type {Bookmark} */
       const bookmark = { url, ...this._doc.bookmarks[url] };
       yield bookmark;
     }
@@ -64,17 +67,22 @@ class CollectionFile {
    * @param {string} url
    */
   async find(url) {
-    return this._doc.bookmarks[String(url).trim()];
+    const normalizedUrl = String(url).trim();
+    return await this._mutex.runExclusive(() => {
+      return this._doc.bookmarks[normalizedUrl];
+    });
   }
 
   /**
    * @param {Bookmark} bookmark
    */
   async save(bookmark) {
-    /** @type {BookmarkData} */
     const { url, name, description, tags } = bookmark;
-    this._doc.bookmarks[String(url).trim()] = { name, description, tags };
-    this.sync();
+    const normalizedUrl = String(url).trim();
+    return await this._mutex.runExclusive(async () => {
+      this._doc.bookmarks[normalizedUrl] = { name, description, tags };
+      await this.sync();
+    });
   }
 
   /**
@@ -82,7 +90,7 @@ class CollectionFile {
    */
   async sync() {
     const payload = JSON.stringify(this._doc, null, 2);
-    await writeFileAtomic(this._filePath, payload, 'utf8');
+    await writeFileAtomic(this._path, payload, 'utf8');
   }
 }
 
