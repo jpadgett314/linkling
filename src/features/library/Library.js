@@ -26,9 +26,9 @@ class Library {
     }
   }
 
-  /** 
-   * @param {string} url 
-   * @returns {Promise<GlobalBookmark[]>} 
+  /**
+   * @param {string} url
+   * @returns {Promise<GlobalBookmark[]>}
    */
   async findUrl(url) {
     const matches = await Promise.all(
@@ -43,8 +43,8 @@ class Library {
     return matches.filter(e => e != null);
   }
 
-  /** 
-   * @param {GlobalBookmark} bookmark 
+  /**
+   * @param {GlobalBookmark} bookmark
    */
   async saveBookmark(bookmark) {
     const collectionId = bookmark.collectionId;
@@ -59,15 +59,43 @@ class Library {
     }
   }
 
-  /** 
-   * @returns {string[]} 
+  /**
+   * @param {number} collectionId
+   * @returns {CollectionMetadata}
+   */
+  getMetadata(collectionId) {
+    collectionId = Math.round(collectionId);
+    const collection = this._collections.get(collectionId);
+    if (collection) {
+      return collection.getMetadata();
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * @param {number} collectionId
+   * @returns {GlobalBookmark[]}
+   */
+  getBookmarks(collectionId) {
+    collectionId = Math.round(collectionId);
+    const collection = this._collections.get(collectionId);
+    if (collection) {
+      return Array.from(collection);
+    } else {
+      return [];
+    }
+  }
+
+  /**
+   * @returns {string[]}
    */
   getAllTags() {
     return [...this._tagIndex].sort((a, b) => a.localeCompare(b));
   }
 
-  /** 
-   * @returns {CollectionMetadata[]} 
+  /**
+   * @returns {CollectionMetadata[]}
    */
   getAllMetadata() {
     return [...this._collections.values()].map(c => c.getMetadata());

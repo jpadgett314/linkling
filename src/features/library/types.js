@@ -26,15 +26,16 @@
  * @typedef {object} CollectionMetadata
  * @property {number} id
  * @property {string} name
- * @property {string} color - Hex Code (#xxxxxx) 
+ * @property {string} color - Hex Code (#xxxxxx)
  * @property {string} version
+ * @property {number} count
  */
 
 /**
  * @typedef {object} CollectionDoc
  * @property {number} id
  * @property {string} name
- * @property {string} color - Hex Code (#xxxxxx) 
+ * @property {string} color - Hex Code (#xxxxxx)
  * @property {number} version
  * @property {Object<string, BookmarkData>} bookmarks
  */

@@ -50,6 +50,7 @@ class CollectionFile {
    */
   getMetadata() {
     const { bookmarks, ...metadata } = this._doc;
+    metadata.count = bookmarks.length;
     return metadata;
   }
 

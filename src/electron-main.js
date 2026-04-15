@@ -42,8 +42,6 @@ function buildMenu() {
 
         const selectedPath = result.filePaths[0];
 
-        console.log('Selected path:', selectedPath);
-
         await fetch(`http://localhost:${httpPort}/config`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },

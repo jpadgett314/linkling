@@ -1,4 +1,5 @@
 /** @typedef {import('./types.js').CollectionMetadata} CollectionMetadata */
+/** @typedef {import('./types.js').Bookmark} Bookmark */
 
 /**
  * @param {CollectionMetadata} metadata
@@ -9,13 +10,19 @@ function mapCollection(metadata) {
     name: metadata.name,
     color: metadata.color,
     createdAt: (new Date()).toISOString(),
+    updatedAt: (new Date()).toISOString(),
     description: metadata.description ?? '',
-    isPublic: false,
+    icon: 'folder',
+    iconWeight: 'regular',
+    isPublic: true,
     members: [],
     ownerId: 1,
+    createdById: 1,
     parent: null,
     parentId: null,
-    updatedAt: (new Date()).toISOString(),
+    _count: {
+      links: metadata.count
+    },
   };
 }
 
@@ -58,14 +65,24 @@ function mapStoredLink(payload) {
 }
 
 /**
- * @param {{ url: string, name: string }} bookmark
+ * @param {Bookmark} bookmark
+ * @param {CollectionMetadata} metadata
  * @param {number} idx
  */
-function mapSearchLink(bookmark, idx) {
+function mapSearchLink(bookmark, metadata, idx) {
   return {
     id: idx + 1,
     url: bookmark.url,
     name: bookmark.name,
+    description: bookmark.description,
+    createdById: 1,
+    collectionId: metadata.id,
+    color: '#000000',
+    createdAt: (new Date()).toISOString(),
+    updatedAt: (new Date()).toISOString(),
+    pinnedBy: [],
+    tags: bookmark.tags.map((tag, idx) => mapTag(tag, idx)),
+    collection: mapCollection(metadata),
   };
 }
 

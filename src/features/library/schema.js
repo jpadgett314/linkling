@@ -14,5 +14,4 @@ const CollectionDocSchema = z.object({
   bookmarks: z.record(z.string(), BookmarkDataSchema),
 });
 
-
 export { BookmarkDataSchema, CollectionDocSchema };
