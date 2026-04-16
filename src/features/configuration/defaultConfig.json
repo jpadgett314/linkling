@@ -1,3 +1,4 @@
 {
-  "libraryDirectory": "./collections"
+  "libraryDirectory": "./collections",
+  "port": 3000
 }

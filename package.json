@@ -9,7 +9,7 @@
     "url": "https://github.com/jpadgett314/"
   },
   "type": "module",
-  "main": "src/electron-main.js",
+  "main": "src/index-electron.js",
   "scripts": {
     "start": "node src/index.js",
     "electron:dev": "electron .",

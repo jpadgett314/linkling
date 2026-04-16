@@ -1,4 +1,5 @@
 import { Collection } from "./Collection.js";
+import { LibraryFactory } from "./LibraryFactory.js";
 
 /** @typedef {import('./types.js').GlobalBookmark} GlobalBookmark */
 /** @typedef {import('./types.js').CollectionMetadata} CollectionMetadata */
@@ -10,6 +11,15 @@ class Library {
     this._collections = new Map(collections.map(c => [c.getMetadata().id, c]));
     /** @type {Set<string>} */
     this._tagIndex = new Set();
+  }
+
+  /**
+   * @param {string} libraryDirectory
+   */
+  async init(libraryDirectory) {
+    const factory = new LibraryFactory(libraryDirectory);
+    const obj = await factory.makeLibrary();
+    Object.assign(this, obj);
   }
 
   /**

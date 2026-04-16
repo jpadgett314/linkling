@@ -43,18 +43,16 @@ function placesToBookmarks(places) {
  * @returns {IntermediateNode}
  */
 function placesToNode(places, title) {
-  let id, guid;
+  let guid;
   if (places?.length > 0) {
-    id = places[0].id || randomId();
     guid = places[0].guid || randomId();
   } else {
-    id = randomId();
     guid = randomId();
   }
   return {
     path: `${guid}.json`,
     collection: {
-      id,
+      id: randomId(),
       name: title,
       color: randomColor(),
       version: 1,

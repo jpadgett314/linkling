@@ -1,4 +1,4 @@
-import { z } from 'zod.js';
+import { z } from 'zod';
 
 const BookmarkTypeEnum = z.union([z.literal(1), z.literal(2)]);
 

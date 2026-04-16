@@ -1,7 +1,15 @@
-import { startServer } from './startServer.js';
+import { Library } from './features/library/Library.js';
+import { ConfigurationRegistry } from './features/configuration/ConfigurationRegistry.js';
+import { LinklingServer } from './LinklingServer.js';
 
-const requestedPort = Number(process.env.PORT) || 3000;
-const host = process.env.PUBLIC ? '0.0.0.0' : '127.0.0.1';
-const hostString = process.env.PUBLIC ? 'your-ip-address' : 'localhost';
-const { port } = await startServer(requestedPort, host);
-console.log(`Linkling listening on http://${hostString}:${port}`);
+async function init() {
+  const registry = new ConfigurationRegistry();
+  const library = new Library([]);
+  const server = new LinklingServer(registry, library);
+
+  await registry.init();
+  await library.init(registry.get('libraryDirectory'));
+  await server.startLocal();
+}
+
+await init();
