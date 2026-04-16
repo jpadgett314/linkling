@@ -1,4 +1,4 @@
-import { response, Router } from 'express';
+import { Router } from 'express';
 import multer from 'multer';
 import { BookmarkService } from './BookmarkService.js';
 import { mapCollection, mapTag, mapStoredLink, mapSearchLink } from './linkwardenMappers.js';
