@@ -15,7 +15,7 @@ async function loadLibrary(dir) {
   /** @type {Set<number, CollectionFile>} collectionId -> obj */
   const matches = new Map();
   /** @type {string[]} */
-  const entries = await fs.readdir(dir);
+  const entries = await fs.readdir(dir, { recursive: true });
 
   const loadCollection = async (name) => {
     if (!(name.endsWith('.json'))) {
@@ -45,6 +45,8 @@ async function loadLibrary(dir) {
 
   await Promise.all(entries.map(loadCollection));
 
+  // Ensure collection with id 0 exists as a default
+  // TODO: configurable default collection
   if (!matches.has(0)) {
     matches.set(0, await CollectionFile.fromDefaults(dir));
   }
