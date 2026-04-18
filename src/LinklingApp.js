@@ -24,7 +24,6 @@ class LinklingApp {
     const tray = buildTray(menu);
     app.on('before-quit', () => {
       tray?.destroy();
-      tray = null;
     });
   }
 
