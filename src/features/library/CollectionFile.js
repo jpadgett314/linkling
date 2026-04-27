@@ -1,17 +1,15 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import writeFileAtomic from 'write-file-atomic';
-import DEFAULT_COLLECTION from './defaultCollection.json' with { type: 'json' };
-import { Mutex } from 'async-mutex';
-import { Collection } from './Collection.js';
-import { CollectionDocSchema } from './schema.js';
-
 /** @typedef {import('./types.js').Bookmark} Bookmark */
 /** @typedef {import('./types.js').BookmarkData} BookmarkData */
 /** @typedef {import('./types.js').CollectionDoc} CollectionDoc */
 /** @typedef {import('./types.js').CollectionMetadata} CollectionMetadata */
 
-/** @implements {Collection} */
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import writeFileAtomic from 'write-file-atomic';
+import DEFAULT_COLLECTION from './collection0.json' with { type: 'json' };
+import { Mutex } from 'async-mutex';
+import { CollectionDocSchema } from './schema.js';
+
 class CollectionFile {
   constructor() {
     /** @type {Mutex} */
@@ -82,6 +80,17 @@ class CollectionFile {
     const normalizedUrl = String(url).trim();
     return await this._mutex.runExclusive(async () => {
       this._doc.bookmarks[normalizedUrl] = { name, description, tags };
+      await this.sync();
+    });
+  }
+
+  /**
+   * @param {string} url
+   */
+  async delete(url) {
+    const normalizedUrl = String(url).trim();
+    return await this._mutex.runExclusive(async () => {
+      delete this._doc.bookmarks[normalizedUrl]
       await this.sync();
     });
   }

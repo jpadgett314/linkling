@@ -1,16 +1,28 @@
-import { Collection } from "./Collection.js";
-import { LibraryFactory } from "./LibraryFactory.js";
-
 /** @typedef {import('./types.js').GlobalBookmark} GlobalBookmark */
 /** @typedef {import('./types.js').CollectionMetadata} CollectionMetadata */
 
+import { LibraryFactory } from './LibraryFactory.js';
+import { urlToId, tagToId } from './models/common/ids.js';
+import { BookmarkCollections } from './models/BookmarkCollections.js';
+import { Bookmarks } from './models/Bookmarks.js';
+import { Tags } from './models/Tags.js';
+import { CollectionFile } from './CollectionFile.js';
+
 class Library {
-  /** @param {Collection[]} collections */
+  /** @param {CollectionFile[]} collections */
   constructor(collections) {
-    /** @type {Map<number, Collection>} */
+    /** @type {Map<number, CollectionFile>} */
     this._collections = new Map(collections.map(c => [c.getMetadata().id, c]));
-    /** @type {Set<string>} */
-    this._tagIndex = new Set();
+    /** @type {Map<number, string>} */
+    this._tagIndex = new Map();
+    /** @type {Map<number, string>} */
+    this._urlIndex = new Map();
+    /** @type {BookmarkCollections} */
+    this._bookmarkCollectionsModel = new BookmarkCollections(collections);
+    /** @type {Bookmarks} */
+    this._bookmarksModel = new Bookmarks(this._collections, this._tagIndex, this._urlIndex, this);
+    /** @type {Tags} */
+    this._tagsModel = new Tags(this._tagIndex);
   }
 
   /**
@@ -30,85 +42,35 @@ class Library {
     for (const collection of this._collections.values()) {
       for (const bookmark of collection) {
         for (const tag of bookmark.tags ?? []) {
-          this._tagIndex.add(tag);
+          this._tagIndex.set(await tagToId(tag), tag);
         }
+        this._urlIndex.set(await urlToId(bookmark.url), bookmark.url);
       }
     }
   }
 
   /**
-   * @param {string} url
-   * @returns {Promise<GlobalBookmark[]>}
+   * @returns {IterableIterator<GlobalBookmark>}
    */
-  async findUrl(url) {
-    const matches = await Promise.all(
-      this._collections.entries().map(
-        ([id, collection]) => {
-          return collection.find(url).then(b => {
-            return b ? { url, collectionId: id, ...b } : null
-          })
-        }
-      )
-    )
-    return matches.filter(e => e != null);
-  }
-
-  /**
-   * @param {GlobalBookmark} bookmark
-   */
-  async saveBookmark(bookmark) {
-    const collectionId = bookmark.collectionId;
-    const collection = this._collections.get(collectionId);
-    if (collection) {
-      await collection.save(bookmark);
-      for (const tag of bookmark.tags ?? []) {
-        this._tagIndex.add(tag);
+  *[Symbol.iterator]() {
+    for (const [id, collection] of this._collections.entries()) {
+      for (const bookmark of collection) {
+        const global = { collectionId: id, ...bookmark };
+        yield global;
       }
-    } else {
-      throw new Error(`Collection not found: ${collectionId}`);
     }
   }
 
-  /**
-   * @param {number} collectionId
-   * @returns {CollectionMetadata}
-   */
-  getMetadata(collectionId) {
-    collectionId = Math.round(collectionId);
-    const collection = this._collections.get(collectionId);
-    if (collection) {
-      return collection.getMetadata();
-    } else {
-      return null;
-    }
+  get BookmarkCollections() {
+    return this._bookmarkCollectionsModel;
   }
 
-  /**
-   * @param {number} collectionId
-   * @returns {GlobalBookmark[]}
-   */
-  getBookmarks(collectionId) {
-    collectionId = Math.round(collectionId);
-    const collection = this._collections.get(collectionId);
-    if (collection) {
-      return Array.from(collection);
-    } else {
-      return [];
-    }
+  get Bookmarks() {
+    return this._bookmarksModel;
   }
 
-  /**
-   * @returns {string[]}
-   */
-  getAllTags() {
-    return [...this._tagIndex].sort((a, b) => a.localeCompare(b));
-  }
-
-  /**
-   * @returns {CollectionMetadata[]}
-   */
-  getAllMetadata() {
-    return [...this._collections.values()].map(c => c.getMetadata());
+  get Tags() {
+    return this._tagsModel;
   }
 }
 

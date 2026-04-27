@@ -19,7 +19,7 @@ async function loadLibrary(dir) {
 
   const loadCollection = async (name) => {
     if (!(name.endsWith('.json'))) {
-      console.log(`Skipping non-JSON file: ${name}`);
+      console.log(`Skipping ${name} (non-JSON file)`);
       return;
     }
     try {
