@@ -1,5 +1,5 @@
 import { Library } from './features/library/Library.js';
-import { ConfigurationRegistry } from './features/configuration/ConfigurationRegistry.js';
+import { ConfigurationRegistry } from './features/settings/ConfigurationRegistry.js';
 import { LinklingServer } from './LinklingServer.js';
 
 async function init() {

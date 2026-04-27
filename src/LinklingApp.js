@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { app, Tray, Menu, nativeImage, dialog } from 'electron';
-import { ConfigurationRegistry } from './features/configuration/ConfigurationRegistry.js';
+import { ConfigurationRegistry } from './features/settings/ConfigurationRegistry.js';
 import { LinklingServer } from './LinklingServer.js';
 import { importBookmarks } from './features/migration/firefox/importBookmarks.js';
 import { Library } from './features/library/Library.js';

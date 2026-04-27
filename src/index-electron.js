@@ -1,7 +1,7 @@
 import { app } from 'electron';
 import { LinklingApp } from './LinklingApp.js';
 import { Library } from './features/library/Library.js';
-import { ConfigurationRegistry } from './features/configuration/ConfigurationRegistry.js';
+import { ConfigurationRegistry } from './features/settings/ConfigurationRegistry.js';
 import { LinklingServer } from './LinklingServer.js';
 
 if (!app.requestSingleInstanceLock()) {
