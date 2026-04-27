@@ -23,6 +23,16 @@
  */
 
 /**
+ * @typedef {object} BookmarkRecord
+ * @property {number} id
+ * @property {number} collectionId
+ * @property {string} url
+ * @property {string} name
+ * @property {string} description
+ * @property {string[]} tags
+ */
+
+/**
  * @typedef {object} CollectionMetadata
  * @property {number} id
  * @property {string} name
@@ -40,4 +50,18 @@
  * @property {Object<string, BookmarkData>} bookmarks
  */
 
-export {};
+/**
+ * @typedef {object} TagMetadata
+ * @property {number} id
+ * @property {string} text
+ */
+
+/** @interface */
+class BookmarkIterable {
+  /**
+   * @returns {IterableIterator<Bookmark>}
+   */
+  *[Symbol.iterator]() {}
+}
+
+export { BookmarkIterable };
