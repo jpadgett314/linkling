@@ -1,0 +1,27 @@
+info:
+  name: Update
+  type: http
+  seq: 9
+
+http:
+  method: PUT
+  url: http://127.0.0.1:3000/linkding/api/bookmarks/92823102062765/
+  body:
+    type: json
+    data: |-
+      {
+        "url": "https://example.com",
+        "title": "New Example Title",
+        "description": "New Example Description",
+        "tag_names": [
+          "new-tag1",
+          "new-tag2"
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

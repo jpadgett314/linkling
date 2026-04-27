@@ -1,0 +1,31 @@
+info:
+  name: Create
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: http://127.0.0.1:3000/linkding/api/bookmarks/
+  body:
+    type: json
+    data: |-
+      {
+        "url": "https://example.com",
+        "title": "Example title",
+        "description": "Example description",
+        "notes": "Example notes",
+        "is_archived": false,
+        "unread": false,
+        "shared": false,
+        "tag_names": [
+          "tag1",
+          "tag2"
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

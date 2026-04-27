@@ -1,0 +1,27 @@
+info:
+  name: Update Partial
+  type: http
+  seq: 10
+
+http:
+  method: PATCH
+  url: http://127.0.0.1:3000/linkding/api/bookmarks/92823102062765/
+  body:
+    type: json
+    data: |-
+      {
+        "url": "https://example.com",
+        "title": "New Example Title 2",
+        "description": "New Example Description 2",
+        "tag_names": [
+          "new-new-tag1",
+          "new-new-tag2"
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

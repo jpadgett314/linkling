@@ -1,0 +1,15 @@
+info:
+  name: Archive
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: http://127.0.0.1:3000/linkding/api/bookmarks/1234/archive/
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
