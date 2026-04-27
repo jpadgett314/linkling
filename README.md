@@ -25,7 +25,7 @@ Linkling isn't suitable for sharing bookmarks, no. If you're going to self-host,
 You can sync the JSON bookmark collections using a cloud storage provider, but merge conflicts are likely if two users simultaneously modify the database.
 
 > [!WARNING]
-> As of version 0.1.0, Linkling does not detect external changes while running.
+> As of current version, Linkling does not detect external changes while running.
 
 ## Development
 
