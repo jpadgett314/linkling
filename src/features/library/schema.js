@@ -2,8 +2,12 @@ import { z } from 'zod';
 
 const BookmarkDataSchema = z.object({
   name: z.string(),
-  description: z.string(),
-  tags: z.array(z.string()),
+  description: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+});
+
+const BookmarkSchema = BookmarkDataSchema.extend({
+  url: z.string(),
 });
 
 const CollectionDocSchema = z.object({
@@ -14,4 +18,4 @@ const CollectionDocSchema = z.object({
   bookmarks: z.record(z.string(), BookmarkDataSchema),
 });
 
-export { BookmarkDataSchema, CollectionDocSchema };
+export { BookmarkDataSchema, BookmarkSchema, CollectionDocSchema };

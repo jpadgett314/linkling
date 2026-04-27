@@ -1,25 +1,44 @@
 import express from 'express';
 import cors from 'cors';
 import http from 'node:http';
-import { ConfigurationRegistry } from './features/configuration/ConfigurationRegistry.js';
+import { ConfigurationRegistry } from './features/settings/ConfigurationRegistry.js';
 import { Library } from './features/library/Library.js';
-import { createConfigurationRoutes } from './features/configuration/routes.js';
-import { createAuthRoutes } from './features/auth/routes.js';
-import { createBookmarkRoutes } from './features/library/routes.js';
+import { createConfigurationRoutes } from './features/settings/routes.js';
+import { createLinkdingRoutes } from './features/integrations/linkding/index.js';
+import { createLinkwardenRoutes } from './features/integrations/linkwarden/index.js';
+
+function createLogger() {
+  return (req, _res, next) => {
+    console.log("---- Incoming Request ----");
+    console.log("Time:", new Date().toISOString());
+    console.log("Method:", req.method);
+    console.log("URL:", req.originalUrl);
+    console.log("Params:", req.params);
+    console.log("Query:", req.query);
+    console.log("Body:", req.body);
+    console.log("Headers:", req.headers);
+    next();
+  };
+}
 
 /**
  * @returns {express.Express}
  */
 function create(registry, library) {
   const app = express();
-
+  const linklingRouter = createLinkdingRoutes(library);
+  const linkwardenRouter = createLinkwardenRoutes(library);
   app.use(cors({ origin: true, credentials: true }));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(createLogger());
   app.use('/', createConfigurationRoutes(registry));
-  app.use('/api/v1', createAuthRoutes());
-  app.use('/api/v1', createBookmarkRoutes(library));
+  app.use('/', linklingRouter);
+  app.use('/', linkwardenRouter);
+  app.use('/linkding', linklingRouter);
+  app.use('/linkwarden', linkwardenRouter);
   app.use((req, res) => {
+    console.log("Route not found.");
     res.status(404).json({ error: 'Not found', path: req.originalUrl });
   });
 
@@ -54,10 +73,6 @@ class LinklingServer {
     this._server = server;
 
     console.log(`Linkling listening on http://${host}:${port}`);
-
-    // const addr = server.address();
-    // const boundPort = typeof addr === 'object' ? addr.port : port;
-    // return { server, port: boundPort };
   }
 
   async startLocal() {

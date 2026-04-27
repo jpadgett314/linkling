@@ -19,7 +19,7 @@ class BookmarkService {
       tags,
     };
 
-    await this._library.saveBookmark(payload);
+    await this._library.Bookmarks.save(payload);
 
     return {
       ...payload,
@@ -36,7 +36,7 @@ class BookmarkService {
     if (!urlMatch) return [];
     const targetUrl = decodeURIComponent(urlMatch[1].trim());
     if (!targetUrl) return [];
-    return this._library.findUrl(targetUrl);
+    return await this._library.Bookmarks.find({ url: targetUrl });
   }
 }
 

@@ -18,7 +18,6 @@ function createAuthRoutes() {
   });
 
   router.post('/session', (req, res) => {
-    console.log('Body:', JSON.stringify(req.body, null, 2));
     res.json({
       response: {
         token: 'mock-token-from-username-password',

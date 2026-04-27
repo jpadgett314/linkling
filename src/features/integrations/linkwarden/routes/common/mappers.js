@@ -1,5 +1,6 @@
-/** @typedef {import('./types.js').CollectionMetadata} CollectionMetadata */
-/** @typedef {import('./types.js').Bookmark} Bookmark */
+/** @typedef {import('../../../../library/types.js').CollectionMetadata} CollectionMetadata */
+/** @typedef {import('../../../../library/types.js').Bookmark} Bookmark */
+/** @typedef {import('../../../../library/types.js').BookmarkRecord} BookmarkRecord */
 
 /**
  * @param {CollectionMetadata} metadata
@@ -65,13 +66,12 @@ function mapStoredLink(payload) {
 }
 
 /**
- * @param {Bookmark} bookmark
+ * @param {BookmarkRecord} bookmark
  * @param {CollectionMetadata} metadata
- * @param {number} idx
  */
-function mapSearchLink(bookmark, metadata, idx) {
+function mapSearchLink(bookmark, metadata) {
   return {
-    id: idx + 1,
+    id: bookmark.id,
     url: bookmark.url,
     name: bookmark.name,
     description: bookmark.description,
