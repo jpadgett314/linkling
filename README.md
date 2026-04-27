@@ -57,3 +57,9 @@ Benchmark test uses [Grafana k6](https://grafana.com/docs/k6/latest/set-up/insta
 Performance is mainly bottlenecked by the filesystem.
 
 For the server itself, >10k bookmarks per collection is no issue in practice. Clients may have their own problems with collections this large.
+
+## Attribution
+
+The icons located in `/assets` are sourced from the Twemoji project.
+Copyright 2019 Twitter, Inc and other contributors.
+These graphics are licensed under CC-BY 4.0.
