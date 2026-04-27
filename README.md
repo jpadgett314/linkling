@@ -2,10 +2,11 @@
 
 Do you dislike cloud-based bookmark services, but don't want to self-host? Then consider Linkling bookmark server, which stores bookmarks in simple JSON files.
 
-Linkling aims to implement the Linkwarden API for compatiblity with the Linkwarden ecosystem.
+Linkling aims to implement the Linkding and Linkwarden APIs for compatiblity with those ecosystems.
 
 Currently, Linkling is compatible with the following projects:
 - [Official Linkwarden Browser Extension](https://github.com/linkwarden/browser-extension)
+- [Linka!](https://github.com/linka-app/linka) (linkding web client)
 
 One goal of this project is to support [Floccus](https://floccus.org/), the Syncthing of the bookmark world, by leveraging the current Linkwarden integration.
 
@@ -60,6 +61,4 @@ For the server itself, >10k bookmarks per collection is no issue in practice. Cl
 
 ## Attribution
 
-The icons located in `/assets` are sourced from the Twemoji project.
-Copyright 2019 Twitter, Inc and other contributors.
-These graphics are licensed under CC-BY 4.0.
+The icons located in `/assets` are sourced from the Twemoji project. Copyright 2019 Twitter, Inc and other contributors. These graphics are licensed under CC-BY 4.0.
