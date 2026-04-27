@@ -1,4 +1,4 @@
-/** @typedef {import(../library/types.js).CollectionDoc} */
+/** @typedef {import('../library/types.js').CollectionDoc} CollectionDoc */
 
 /**
  * @typedef {Object} IntermediateNode

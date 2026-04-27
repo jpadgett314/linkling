@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import writeFileAtomic from 'write-file-atomic';
-import { ConfigurationRegistry } from '../../configuration/ConfigurationRegistry.js'
+import { ConfigurationRegistry } from '../../settings/ConfigurationRegistry.js'
 import { convertFirefox } from './convertFirefoxTree.js';
 import { prunePlaceholders } from './placeholders.js';
 import { flatten, pruneEmpty, resolvePaths, untagAll } from '../treeTransform.js';
@@ -53,7 +53,7 @@ async function importBookmarks(jsonPath, registry) {
   const tree = await load(jsonPath);
   resolvePaths(tree, outdir);
   await save(tree);
-  // TODO: return new collection name and path.
+  return tree.path;
 }
 
 export { importBookmarks };

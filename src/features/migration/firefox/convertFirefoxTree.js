@@ -1,10 +1,10 @@
-import { randomColor, randomId } from "../util.js";
-
 /** @typedef {import('./types.js').FirefoxBookmark} FirefoxBookmark */
 /** @typedef {import('./types.js').FirefoxFolder} FirefoxFolder */
 /** @typedef {import('./types.js').FirefoxBookmarkBackup} FirefoxBookmarkBackup */
 /** @typedef {import('./treeTypes.js').IntermediateNode} IntermediateNode */
 /** @typedef {import('./treeTypes.js').IntermediateTree} IntermediateTree */
+
+import { randomColor, randomId } from '../util.js';
 
 /**
  * @param {FirefoxBookmark} place

@@ -1,8 +1,8 @@
-import path from 'node:path';
-import { randomId, safeFileName } from './util.js';
-
 /** @typedef {import('./treeTypes.js').IntermediateTree} IntermediateTree */
 /** @typedef {import('../library/types.js').CollectionDoc} CollectionDoc */
+
+import path from 'node:path';
+import { randomId, safeFileName } from './util.js';
 
 /**
  * @param {IntermediateTree} tree - Mutates
