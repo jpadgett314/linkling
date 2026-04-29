@@ -11,11 +11,11 @@ function createLinksRoutes(library) {
   const router = Router();
   const bookmarkService = new BookmarkService(library);
 
-  router.get('/links', (req, res) => {
+  router.get('/links', async (req, res) => {
     const { cursor, collectionId } = req.query;
     if (collectionId) {
-      const cdata = library.BookmarkCollections.find({ collectionId });
-      const links = library.Bookmarks.find({ collectionId });
+      const cdata = await library.BookmarkCollections.find({ collectionId });
+      const links = await library.Bookmarks.find({ collectionId });
       const response = links.map(l => mapSearchLink(l, cdata));
       res.json({ response: [ response[cursor] ] });
     } else {
@@ -53,13 +53,16 @@ function createLinksRoutes(library) {
   });
 
   router.get('/search', async (req, res) => {
-    const cdata = library.BookmarkCollections.find({ collectionId });
     const links = await bookmarkService.searchLinks(req.query.searchQueryString);
-    res.json({
-      data: {
-        links: links.map(r => mapSearchLink(r, cdata)),
-      },
-    });
+    const linkData = await Promise.all(
+      links.map(async bookmark => {
+        return mapSearchLink(
+          bookmark,
+          await library.BookmarkCollections.find({ collectionId: bookmark.collectionId })
+        );
+      })
+    );
+    res.json({ data: { links: linkData } });
   });
 
  return router;

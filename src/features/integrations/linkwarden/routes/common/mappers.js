@@ -28,13 +28,13 @@ function mapCollection(metadata) {
 }
 
 /**
- * @param {string} name
+ * @param {object} tag
  * @param {number} idx
  */
-function mapTag(name, idx) {
+function mapTag(tag, idx) {
   return {
-    id: idx + 1,
-    name,
+    id: tag.id,
+    name: tag.text,
     ownerId: 1,
     createdAt: (new Date()).toISOString(),
     updatedAt: (new Date()).toISOString(),
