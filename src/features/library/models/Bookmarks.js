@@ -63,7 +63,7 @@ class Bookmarks {
     return await this._saveNoUpdate(
       {
         collectionId,
-        ...(await this.find({id, url, collectionId}))[0],
+        ...(await this.find({ id, url, collectionId }))[0],
         ...bookmark
       }
     );

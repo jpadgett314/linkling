@@ -85,7 +85,7 @@ function createBookmarksRoutes(library) {
     const result = await library.Bookmarks.save(bookmark);
 
     if (result) {
-      res.json(mapBookmark(result));
+      res.status(201).json(mapBookmark(result));
     } else {
       res.status(422).json({ detail: "Not saveable."});
     }
@@ -150,7 +150,7 @@ function createBookmarksRoutes(library) {
     const result = (await library.Bookmarks.delete({ id }))[0];
 
     if (result) {
-      res.json(mapBookmark(result));
+      res.status(204).json(mapBookmark(result));
     } else {
       res.status(404).json({ detail: "Not found." });
     }
