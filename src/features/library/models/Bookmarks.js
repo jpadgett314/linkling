@@ -96,6 +96,7 @@ class Bookmarks {
       return null;
     }
 
+    bookmark.tags?.sort();
     const { collectionId = 0 } = bookmark;
     const id = bookmark.id ?? await urlToId(bookmark.url);
     /** @type {BookmarkRecord} */
