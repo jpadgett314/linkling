@@ -117,7 +117,7 @@ function flatten(tree, height=1) {
     const parentPath = path.dirname(tree.path);
 
     // Tag everything with the current folder name to preserve context
-    tagAll(merged, folderName);
+    tagAll(merged, safeFileName(folderName));
 
     return {
       path: path.join(parentPath, `${randomId()}.json`),
