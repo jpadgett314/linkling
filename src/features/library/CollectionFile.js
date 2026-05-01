@@ -99,7 +99,7 @@ class CollectionFile {
    * Sync collection changes to JSON file (one way)
    */
   async sync() {
-    const payload = JSON.stringify(this._doc, null, 2);
+    const payload = JSON.stringify(this._doc);
     await writeFileAtomic(this._path, payload, 'utf8');
   }
 }
