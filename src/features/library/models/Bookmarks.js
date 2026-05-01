@@ -60,7 +60,7 @@ class Bookmarks {
   async save(bookmark) {
     const { id, url, collectionId = 0 } = bookmark;
 
-    return await this._saveNoUpdate(
+    return await this._saveComplete(
       {
         collectionId,
         ...(await this.find({ id, url, collectionId }))[0],
@@ -89,7 +89,7 @@ class Bookmarks {
   /**
    * @param {Partial<BookmarkRecord>} bookmark
    */
-  async _saveNoUpdate(bookmark) {
+  async _saveComplete(bookmark) {
     try {
       BookmarkSchema.parse(bookmark);
     } catch {
@@ -104,7 +104,7 @@ class Bookmarks {
     await collection.save(saved);
     this._urlIndex.set(id, bookmark.url);
     for (const tag of bookmark?.tags) {
-      this._tagIndex.set(tagToId(tag), tag);
+      this._tagIndex.set(await tagToId(tag), tag);
     }
 
     return saved;

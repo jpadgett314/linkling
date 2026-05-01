@@ -90,7 +90,7 @@ class CollectionFile {
   async delete(url) {
     const normalizedUrl = String(url).trim();
     return await this._mutex.runExclusive(async () => {
-      delete this._doc.bookmarks[normalizedUrl]
+      delete this._doc.bookmarks[normalizedUrl];
       await this.sync();
     });
   }

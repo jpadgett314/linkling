@@ -16,7 +16,7 @@ class Tags {
    */
   async find(query) {
     const id1 = query.id;
-    const id2 = query.text? tagToId(query.text) : null;
+    const id2 = query.text? await tagToId(query.text) : null;
     const tag = this._tagIndex.get(id1 ?? id2);
     let matches = [];
 
