@@ -32,7 +32,7 @@
     "electron-builder": "^26.8.1"
   },
   "build": {
-    "appId": "com.linkling.server",
+    "appId": "io.github.jpadgett314.Linkling",
     "productName": "Linkling",
     "directories": {
       "output": "dist"
