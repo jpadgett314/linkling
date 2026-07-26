@@ -26,10 +26,12 @@ async function main() {
     process.env.LINKLING_DATA_DIR = app.getPath('userData');
   }
 
-  app.setLoginItemSettings({
-    openAtLogin: true,
-    enabled: true,
-  });
+  if (process.platform === 'win32' || process.platform === 'darwin') {
+    app.setLoginItemSettings({
+      openAtLogin: true,
+      enabled: true,
+    });
+  }
 
   await init();
 }
