@@ -40,15 +40,7 @@ npm install
 ### Start Server
 
 ```bash
-npm start         # server only
-npm electron:dev  # server with Electron tray + menu
-```
-
-### Package for Windows, Flatpak
-
-```
-npm run dist:nsis
-npm run dist:flatpak
+npm start
 ```
 
 ## Testing

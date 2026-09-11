@@ -5,73 +5,22 @@
   "description": "JSON-based bookmark server",
   "author": {
     "name": "Jacob Padgett",
-    "email": "jacobapadgett@gmail.com",
     "url": "https://github.com/jpadgett314/"
   },
   "type": "module",
-  "main": "src/index-electron.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "electron:dev": "electron .",
-    "dist:nsis": "electron-builder --win nsis",
-    "dist:flatpak": "electron-builder --linux flatpak"
+    "start": "node src/index.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=26"
   },
   "dependencies": {
     "async-mutex": "^0.5.0",
     "cors": "^2.8.5",
-    "express": "^4.21.2",
+    "express": "^5.2.1",
     "multer": "^1.4.5-lts.2",
     "write-file-atomic": "^7.0.1",
     "zod": "^4.3.6"
-  },
-  "devDependencies": {
-    "electron": "^41.1.1",
-    "electron-builder": "^26.8.1"
-  },
-  "build": {
-    "appId": "io.github.jpadgett314.Linkling",
-    "productName": "Linkling",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "**/*",
-      "!dist/**",
-      "!.git/**"
-    ],
-    "win": {
-      "target": [
-        "nsis"
-      ],
-      "icon": "assets/icon-256.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
-    },
-    "linux": {
-      "target": [
-        "flatpak"
-      ],
-      "icon": "assets/icon-512.png",
-      "category": "Utility",
-      "maintainer": "Jacob Padgett <jacobapadgett@gmail.com>"
-    },
-    "flatpak": {
-      "runtime": "org.freedesktop.Platform",
-      "runtimeVersion": "25.08",
-      "sdk": "org.freedesktop.Sdk",
-      "finishArgs": [
-        "--share=ipc",
-        "--share=network",
-        "--socket=x11",
-        "--socket=wayland",
-        "--device=dri",
-        "--filesystem=home"
-      ]
-    }
   }
 }
