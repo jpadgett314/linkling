@@ -1,0 +1,11 @@
+{
+    "bundle": true,
+    "entryPoints": ["./src/index.js"],
+    "format": "cjs",
+    "minify": true,
+    "outfile": "./dist/bundle.js",
+    "platform": "node",
+    "sourcemap": false,
+    "target": "node26",
+    "logLevel": "info"
+}

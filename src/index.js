@@ -12,4 +12,7 @@ async function init() {
   await server.startLocal();
 }
 
-await init();
+process.title = 'linkling';
+
+init();
+
