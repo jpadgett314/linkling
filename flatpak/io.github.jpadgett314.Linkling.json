@@ -1,0 +1,38 @@
+{
+  "app-id": "io.github.jpadgett314.Linkling",
+  "runtime": "org.freedesktop.Platform",
+  "runtime-version": "26.08",
+  "sdk": "org.freedesktop.Sdk",
+  "command": "linkling",
+  "finish-args": [
+    "--share=network",
+    "--nosocket=x11",
+    "--nosocket=wayland"
+  ],
+  "modules": [
+    {
+      "name": "linkling",
+      "buildsystem": "simple",
+      "build-commands": [
+        "install -Dm755 linkling /app/bin/linkling",
+        "install -Dm644 io.github.jpadgett314.Linkling.metainfo.xml /app/share/metainfo/io.github.jpadgett314.Linkling.metainfo.xml",
+        "install -Dm644 icon-512.png /app/share/icons/hicolor/512x512/apps/io.github.jpadgett314.Linkling.png"
+      ],
+      "sources": [
+        {
+          "type": "file",
+          "path": "../dist/linkling"
+        },
+        {
+          "type": "file",
+          "path": "./io.github.jpadgett314.Linkling.metainfo.xml"
+        },
+        {
+          "type": "file",
+          "path": "../assets/icon-512.png"
+        }
+      ]
+    }
+  ]
+}
+

@@ -37,11 +37,26 @@ Node 22+ required.
 npm install
 ```
 
+Additional dependencies required for flatpak only:
+
+- `flatpak`
+- `flatpak-builder`
+- Freedesktop 26.08 runtime
+
 ### Start Server
 
 ```bash
 npm start
 ```
+
+### Package Flatpak
+
+```
+npm run build       # creates portable single executable
+npm run package     # creates flatpak
+```
+
+Output is available under `dist/flatpak/package`. 
 
 ## Testing
 

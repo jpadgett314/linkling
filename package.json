@@ -12,9 +12,10 @@
   "scripts": {
     "start": "node src/index.js",
     "clean": "rm -rf dist",
-    "build:bundle": "node esbuild.bundle.js",
+    "build:bundle": "node esbuild.build.js",
     "build:sea": "node --build-sea sea.config.json",
-    "build": "npm run clean && npm run build:bundle && npm run build:sea"
+    "build": "npm run clean && npm run build:bundle && npm run build:sea",
+    "package": "chmod u+x ./flatpak.build.sh && ./flatpak.build.sh"
   },
   "engines": {
     "node": ">=26"
