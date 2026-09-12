@@ -5,7 +5,7 @@ MANIFEST="./flatpak/io.github.jpadgett314.Linkling.json"
 BUILD_DIR="./dist/flatpak/build"
 BUILD_REPO="./dist/flatpak/repo"
 PACKAGE_DIR="./dist/flatpak/package"
-PACKAGE_FILE="$PACKAGE_DIR/linkling.flatpak"
+PACKAGE_FILE="$PACKAGE_DIR/Linkling.flatpak"
 RUNTIME_REPO="https://dl.flathub.org/repo/flathub.flatpakrepo"
 
 if ! command -v flatpak >/dev/null 2>&1; then

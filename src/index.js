@@ -1,5 +1,6 @@
-import { Library } from './features/library/Library.js';
+import path from 'node:path';
 import { ConfigurationRegistry } from './features/settings/ConfigurationRegistry.js';
+import { Library } from './features/library/Library.js';
 import { LinklingServer } from './LinklingServer.js';
 
 async function init() {
@@ -13,6 +14,7 @@ async function init() {
 }
 
 process.title = 'linkling';
+process.env.LINKLING_DATA_DIR = path.join(process.cwd(),  '.linkling');
 
 init();
 

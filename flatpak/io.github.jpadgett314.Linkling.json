@@ -6,22 +6,37 @@
   "command": "linkling",
   "finish-args": [
     "--share=network",
-    "--nosocket=x11",
-    "--nosocket=wayland"
+    "--persist=.linkling"
   ],
   "modules": [
     {
-      "name": "linkling",
+      "name": "nodejs",
       "buildsystem": "simple",
       "build-commands": [
-        "install -Dm755 linkling /app/bin/linkling",
+        "install -Dm755 node-v26.8.2-linux-x64/bin/node /app/bin/node"
+      ],
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://nodejs.org/dist/v26.8.2/node-v26.8.2-linux-x64.tar.gz",
+          "sha256": "badb3fe6a61b85e1352ca6564dc56b8b7bd5ecd5c474c52acc21dd0cdd586f35",
+          "dest": "node-v26.8.2-linux-x64"
+        }
+      ]
+    },
+    {
+      "name": "assets",
+      "buildsystem": "simple",
+      "build-commands": [
+        "install -Dm644 bundle.js /app/lib/linkling/server.js",
         "install -Dm644 io.github.jpadgett314.Linkling.metainfo.xml /app/share/metainfo/io.github.jpadgett314.Linkling.metainfo.xml",
         "install -Dm644 icon-512.png /app/share/icons/hicolor/512x512/apps/io.github.jpadgett314.Linkling.png"
+
       ],
       "sources": [
         {
           "type": "file",
-          "path": "../dist/linkling"
+          "path": "../dist/bundle.js"
         },
         {
           "type": "file",
@@ -30,6 +45,22 @@
         {
           "type": "file",
           "path": "../assets/icon-512.png"
+        }
+      ]
+    },
+    {
+      "name": "linkling",
+      "buildsystem": "simple",
+      "build-commands": [
+        "install -Dm755 linkling /app/bin/linkling"
+      ],
+      "sources": [
+        {
+          "type": "script",
+          "dest-filename": "linkling",
+          "commands": [
+            "exec /app/bin/node /app/lib/linkling/server.js"
+          ]
         }
       ]
     }
