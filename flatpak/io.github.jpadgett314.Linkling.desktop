@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Linkling
 Comment=JSON-based bookmark server. Linkding compatible.
-Exec=io.github.jpadgett314.Linkling
+Exec=linkling
 Icon=io.github.jpadgett314.Linkling
 Type=Application
 Categories=Utility;
