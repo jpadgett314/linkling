@@ -29,9 +29,9 @@
       "buildsystem": "simple",
       "build-commands": [
         "install -Dm644 bundle.js /app/lib/linkling/server.js",
-        "install -Dm644 io.github.jpadgett314.Linkling.metainfo.xml /app/share/metainfo/io.github.jpadgett314.Linkling.metainfo.xml",
-        "install -Dm644 icon-512.png /app/share/icons/hicolor/512x512/apps/io.github.jpadgett314.Linkling.png"
-
+        "install -Dm644 icon.svg /app/share/icons/hicolor/scalable/apps/io.github.jpadgett314.Linkling.svg",
+        "install -Dm644 io.github.jpadgett314.Linkling.desktop /app/share/applications/io.github.jpadgett314.Linkling.desktop",
+        "install -Dm644 io.github.jpadgett314.Linkling.metainfo.xml /app/share/metainfo/io.github.jpadgett314.Linkling.metainfo.xml"
       ],
       "sources": [
         {
@@ -40,11 +40,15 @@
         },
         {
           "type": "file",
-          "path": "./io.github.jpadgett314.Linkling.metainfo.xml"
+          "path": "../assets/icon.svg"
         },
         {
           "type": "file",
-          "path": "../assets/icon-512.png"
+          "path": "./io.github.jpadgett314.Linkling.desktop"
+        },
+        {
+          "type": "file",
+          "path": "./io.github.jpadgett314.Linkling.metainfo.xml"
         }
       ]
     },
