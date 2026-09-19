@@ -29,7 +29,7 @@ You can sync the JSON bookmark collections using a cloud storage provider, but m
 
 ## Development
 
-Node 22+ required.
+Node 26+ required.
 
 ### Install Dependencies
 
