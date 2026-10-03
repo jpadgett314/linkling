@@ -13,6 +13,7 @@
  * @property {string[]} tags
  */
 
+// Avoiding intersection results in better type hints for some reason
 /**
  * @typedef {object} GlobalBookmark
  * @property {number} collectionId
@@ -30,6 +31,31 @@
  * @property {string} name
  * @property {string} description
  * @property {string[]} tags
+ */
+
+/** 
+ * @typedef {(Partial<BookmarkRecord & { substring: string }>)} BookmarkFilters 
+ */
+
+/**
+ * @readonly
+ * @enum {number}
+ */
+const BookmarkQueryType = {
+  Leaf: 0,
+  And: 1,
+  Or: 2,
+};
+
+/** 
+ * @typedef {object} BookmarkQueryNode
+ * @property {BookmarkQueryType} type
+ * @property {BookmarkQuery[]} [ops]
+ * @property {BookmarkFilters} [filters]
+ */
+
+/**
+ * @typedef {BookmarkQueryNode} BookmarkQuery
  */
 
 /**
@@ -64,4 +90,4 @@ class BookmarkIterable {
   *[Symbol.iterator]() {}
 }
 
-export { BookmarkIterable };
+export { BookmarkIterable, BookmarkQueryType };

@@ -1,9 +1,11 @@
-/** @typedef {import("../../types").GlobalBookmark} GlobalBookmark */
+/** @typedef {import("../../types.js").Bookmark} Bookmark */
+/** @typedef {import("../../types.js").BookmarkFilters} BookmarkFilters */
 
+import { BookmarkIterable } from '../../types.js';
 import { urlToId } from './ids.js';
 
 /**
- * @param {GlobalBookmark} bookmark
+ * @param {Bookmark} bookmark
  * @param {Partial<BookmarkRecord>} query
  * @returns {boolean}
  */
@@ -11,7 +13,7 @@ function matching(bookmark, query) {
   for (const [key, value] of Object.entries(query)) {
     switch (key) {
       case 'id':
-        // Not stored in GlobalBookmark
+        // May be present but not technically part of Bookmark
         continue;
       case 'tags':
         if (Array.isArray(value)) {
@@ -22,6 +24,13 @@ function matching(bookmark, query) {
           } else {
             return false;
           }
+        }
+      case 'substring':
+        const text = JSON.stringify(bookmark);
+        if (text.indexOf(value) >= 0) {
+          continue;
+        } else {
+          return false;
         }
       default:
         if (value) {
@@ -38,24 +47,86 @@ function matching(bookmark, query) {
 
 /**
  * @param {BookmarkIterable} iterable
- * @param {Partial<BookmarkRecord>} query
+ * @param {BookmarkFilters} filters
  */
-async function filter(iterable, query) {
-  /** @type {BookmarkRecord[]} */
+function filter(iterable, filters) {
+  /** @type {Bookmark[]} */
   const matches = [];
+  
   for (const bookmark of iterable) {
-    if (matching(bookmark, query)) {
-      matches.push(urlToId(bookmark.url).then(
-        id => (
-          {
-            id,
-            ...structuredClone(bookmark)
-          }
-        )
-      ));
+    if (matching(bookmark, filters)) {
+      matches.push(bookmark);
     }
   }
-  return Promise.all(matches);
+
+  return matches;
 }
 
-export { filter };
+/**
+ * @param {BookmarkIterable[]} args
+ */
+function intersection(...args) {
+  /** @type {Map<string, { bookmark: Bookmark, count: number }>} */
+  const seen = new Map();
+  /** @type {Bookmark[]} */
+  const results = [];
+
+  for (const iterable of args || []) {
+    for (const bookmark of iterable) {
+      const hit = seen.get(bookmark.url);
+      if (hit) {
+        hit.count++;
+      } else {
+        seen.set(bookmark.url, { bookmark, count: 1 });
+      }
+    }
+  }
+
+  for (const record of seen.values()) {
+    if (record.count == args.length) {
+      results.push(record.bookmark);
+    }
+  }
+  
+  return results;
+}
+
+/**
+ * @param {BookmarkIterable[]} args
+ */
+function union(...args) {
+  /** @type {Map<string, Bookmark>} */
+  const map = new Map();
+
+  for (const iterable of args || []) {
+    for (const bookmark of iterable) {
+      map.set(bookmark.url, bookmark);
+    }
+  }
+
+  return Array.from(map.values());
+}
+
+/**
+ * @param {BookmarkIterable} iterable
+ * @returns {Promise<(Bookmark & { id: number })[]>}
+ */
+async function addIds(iterable) {
+  /** @type {Promise<Bookmark>[]} */
+  const results = [];
+
+  for (const bookmark of iterable) {
+    results.push(urlToId(bookmark.url).then(
+      id => (
+        {
+          id,
+          ...structuredClone(bookmark)
+        }
+      )
+    ));
+  }
+
+  return Promise.all(results);
+}
+
+export { filter, intersection, union, addIds };

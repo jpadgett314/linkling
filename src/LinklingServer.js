@@ -57,7 +57,7 @@ class LinklingServer {
     this._library = library;
     /** @type {Express} */
     this._express = create(registry, library);
-    /** @type {import('node:http').Server  | null} */
+    /** @type {import('node:http').Server | null} */
     this._server = null;
   }
 

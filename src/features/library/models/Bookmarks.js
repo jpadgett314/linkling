@@ -1,10 +1,12 @@
 /** @typedef {import("../types.js").Bookmark} Bookmark */
+/** @typedef {import("../types.js").BookmarkFilters} BookmarkFilters */
+/** @typedef {import("../types.js").BookmarkQuery} BookmarkQuery */
 /** @typedef {import("../types.js").BookmarkRecord} BookmarkRecord */
 
 import { CollectionFile } from '../CollectionFile.js';
 import { BookmarkSchema } from '../schema.js';
-import { BookmarkIterable } from '../types.js';
-import { filter } from './common/filterBookmarks.js';
+import { BookmarkIterable, BookmarkQueryType } from '../types.js';
+import { filter, intersection, union, addIds } from './common/filterBookmarks.js';
 import { tagToId, urlToId } from './common/ids.js';
 
 class Bookmarks {
@@ -26,32 +28,23 @@ class Bookmarks {
   }
 
   /**
-   * @param {Partial<BookmarkRecord>} query
+   * @param {BookmarkFilters} filters
    */
-  async find(query) {
-    const { id, url, collectionId } = query;
-    /** @type {null | string} */
-    const indexedUrl = this._urlIndex.get(id);
-    /** @type {null | CollectionFile} */
-    const collection = this._collections.get(collectionId);
-    /** @type {null | Bookmark} */
-    const bookmarkMatchingUrl = collection?.find(url ?? indexedUrl);
-    /** @type {Partial<BookmarkRecord>} */
-    const filters = { url: indexedUrl, ...query };
+  async find(filters) {
+    /** @type {Bookmark[]} */
+    const results = this._filter(filters);
 
-    if (id && !indexedUrl) {
-      return [];
-    } else if (!collectionId) {
-      return filter(this._bookmarks, filters);
-    } else if (!collection) {
-      return [];
-    } else if (!url && !indexedUrl) {
-      return filter(collection, filters);
-    } else if (!bookmarkMatchingUrl) {
-      return [];
-    } else {
-      return filter([bookmarkMatchingUrl], filters);
-    }
+    return addIds(results);
+  }
+
+  /**
+   * @param {BookmarkQuery | null} query 
+   */
+  async find2(query) {
+    /** @type {Bookmark[]} */
+    const results = this._search(query);
+
+    return addIds(results);
   }
 
   /**
@@ -109,6 +102,54 @@ class Bookmarks {
     }
 
     return saved;
+  }
+
+  /**
+   * @param {BookmarkQuery | null} query 
+   */
+  _search(query) {
+    /** @type {Bookmark[][]} */
+    const found = query?.ops?.map(q => this._search(q));
+
+    switch (query?.type) {
+      case BookmarkQueryType.Or:
+        return union(...found);
+      case BookmarkQueryType.And:
+        return intersection(...found);
+      case BookmarkQueryType.Leaf:
+        return this._filter(query.filters || {});
+      default:
+        return [];
+    }
+  }
+
+  /**
+   * @param {BookmarkFilters} fields
+   */
+  _filter(fields) {
+    const { id, url, collectionId } = fields;
+    /** @type {null | string} */
+    const indexedUrl = this._urlIndex.get(id);
+    /** @type {null | CollectionFile} */
+    const collection = this._collections.get(collectionId);
+    /** @type {null | Bookmark} */
+    const bookmarkMatchingUrl = collection?.find(url ?? indexedUrl);
+    /** @type {BookmarkFilters} */
+    const filters = { url: indexedUrl, ...fields };
+
+    if (id && !indexedUrl) {
+      return [];
+    } else if (!collectionId) {
+      return filter(this._bookmarks, filters);
+    } else if (!collection) {
+      return [];
+    } else if (!url && !indexedUrl) {
+      return filter(collection, filters);
+    } else if (!bookmarkMatchingUrl) {
+      return [];
+    } else {
+      return filter([bookmarkMatchingUrl], filters);
+    }
   }
 }
 

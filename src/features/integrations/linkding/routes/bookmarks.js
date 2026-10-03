@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { Library } from '../../../library/Library.js';
+import { BookmarkQueryType } from '../../../library/types.js';
 import { getPaginationUrls } from './common/pagination.js';
 import { mapBookmark, mapBookmarkInput } from './common/mappers.js';
 
@@ -19,7 +20,25 @@ function createBookmarksRoutes(library) {
     const limit = parseInt(req.query.limit) || 100;
     const offset = parseInt(req.query.offset) || 0;
 
-    const result = await library.Bookmarks.find({});
+    const formatQuery = (q) => {
+      return {
+        type: BookmarkQueryType.And,
+        ops: q.split(' ').map(term => (
+          {
+            type: BookmarkQueryType.Leaf,
+            filters: { substring: term }
+          }
+        ))
+      }
+    }
+
+    const result = await (async () => {
+      if (q && typeof(q) === 'string') {
+        return await library.Bookmarks.find2(formatQuery(q));
+      } else {
+        return await library.Bookmarks.find({});
+      }
+    })();
 
     const sliced = result.slice(offset, offset + limit);
 
