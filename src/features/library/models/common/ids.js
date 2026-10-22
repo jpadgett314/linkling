@@ -1,6 +1,21 @@
 /** @typedef {import("../../types").GlobalBookmark} GlobalBookmark */
 
 /**
+ * Only ~55k hashes required for 50% chance of collision.
+ * @param {string} text
+ * @returns {Promise<number>}
+ */
+async function hashTo31(text) {
+  const data = new DataView(
+    await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(text)
+    )
+  );
+  return data.getUint32(0) & ~(1 << 31);
+}
+
+/**
  * Only ~80k hashes required for 50% chance of collision.
  * @param {string} text
  * @returns {Promise<number>}
@@ -38,7 +53,7 @@ async function hashTo48(text) {
  * @returns {Promise<number>}
  */
 async function tagToId(tag) {
-  return hashTo48(tag);
+  return hashTo31(tag);
 }
 
 /**
@@ -47,7 +62,7 @@ async function tagToId(tag) {
  * @returns {Promise<number>}
  */
 async function urlToId(url) {
-  return hashTo48(url);
+  return hashTo31(url);
 }
 
 export { tagToId, urlToId };

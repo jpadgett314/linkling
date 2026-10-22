@@ -7,16 +7,21 @@
 function mapBookmark(bookmark) {
   return {
     id: bookmark.id,
-    url: bookmark.url,
-    title: bookmark.name,
-    description: bookmark.description,
-    nodes: '',
+    url: bookmark.url || '',
+    title: bookmark.name || '',
+    description: bookmark.description ?? '',
+    notes: '',
+    web_archive_snapshot_url: '',
+    favicon_url: null,
+    preview_image_url: null,
     is_archived: false,
     unread: false,
     shared: false,
-    tag_names: bookmark.tags,
+    tag_names: bookmark.tags ?? [],
     date_added: (new Date()).toISOString(),
     date_modified: (new Date()).toISOString(),
+    website_title: null,
+    website_description: null,
   }
 }
 
